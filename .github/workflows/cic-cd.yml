@@ -22,12 +22,12 @@ jobs:
           exit-code: '0'
 
       - name: Build Docker image
-        run: docker build -t ${{ secrets.ECR_REPO }}:latest .
+        run: docker build -t ${{ secrets.ECR_REPO }}/petclinic-dev-repo:latest .
 
       - name: Scan image with Trivy
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: ${{ secrets.ECR_REPO }}:latest
+          image-ref: ${{ secrets.ECR_REPO }}/petclinic-dev-repo:latest
           format: table
           exit-code: '0'
           ignore-unfixed: true
@@ -43,6 +43,11 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
       - name: Push image to ECR
         run: |
-          docker push ${{ secrets.ECR_REPO }}:latest
+          docker push ${{ secrets.ECR_REPO }}/petclinic-dev-repo:latest
+  Deploy_to_ecs:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Deploy to ecs
+              run: echo "Deploy to ecs"
      
               
