@@ -22,12 +22,12 @@ jobs:
           exit-code: '0'
 
       - name: Build Docker image
-        run: docker build -t 977098999802.dkr.ecr.us-east-1.amazonaws.com/petclinic-dev-repo:latest .
+        run: docker build -t ${{ secrets.ECR_REPO }}:latest .
 
       - name: Scan image with Trivy
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: 977098999802.dkr.ecr.us-east-1.amazonaws.com/petclinic-dev-repo:latest
+          image-ref: ${{ secrets.ECR_REPO }}:latest
           format: table
           exit-code: '0'
           ignore-unfixed: true
@@ -36,13 +36,13 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: us-east-1
-          role-to-assume: arn:aws:iam::977098999802:role/github-action-role
+          role-to-assume: ${{ secrets.AWS_ROLE }}
 
       - name: Login to ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
       - name: Push image to ECR
         run: |
-          docker push 977098999802.dkr.ecr.us-east-1.amazonaws.com/petclinic-dev-repo:latest
+          docker push ${{ secrets.ECR_REPO }}:latest
      
               
