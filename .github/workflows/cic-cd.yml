@@ -44,14 +44,38 @@ jobs:
       - name: Push image to ECR
         run: |
           docker push ${{ secrets.ECR_REPO }}/petclinic-dev-repo:latest
+  
   Deploy_to_ecs:
     runs-on: ubuntu-latest
     needs: build-scan
     steps:
-      - name: Deploy to ecs
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+
+      - name: Download current task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition Depportfolio \
+            --query taskDefinition \
+
+            > task-definition.json
+          jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' \
+            task-definition.json > task-definition-clean.json
+
+      - name: Render Amazon ECS task definition
+        id: render-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition-clean.json
+          container-name: exercise
+          image: ${{ secrets.ECR_REPO }}/petclinic-dev-repo:latest
+
+      - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
-      
           service: Depportfolio-service
           cluster: depcluster
           task-definition: ${{ steps.render-task-def.outputs.task-definition }}
