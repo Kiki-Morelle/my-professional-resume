@@ -45,9 +45,15 @@ jobs:
         run: |
           docker push ${{ secrets.ECR_REPO }}/petclinic-dev-repo:latest
   Deploy_to_ecs:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Deploy to ecs
-              run: echo "Deploy to ecs"
+    runs-on: ubuntu-latest
+    needs: build-scan
+    steps:
+      - name: Deploy to ecs
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+      
+          service: Depportfolio-service
+          cluster: depcluster
+          wait-for-service-stability: true
      
               
