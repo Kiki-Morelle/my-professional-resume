@@ -54,6 +54,7 @@ jobs:
       
           service: Depportfolio-service
           cluster: depcluster
+          task-definition: task-definition.json
           wait-for-service-stability: true
      
               
