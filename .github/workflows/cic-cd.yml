@@ -57,10 +57,10 @@ jobs:
 
       - name: Download current task definition
         run: |
+          set -euo pipefail
           aws ecs describe-task-definition \
             --task-definition Depportfolio \
             --query taskDefinition \
-
             > task-definition.json
           jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' \
             task-definition.json > task-definition-clean.json
